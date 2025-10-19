@@ -1,0 +1,190 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+$width: 600px;
+$height: 414px;
+
+
+@mixin full-width {
+    width: 100%;
+    height: 100%;
+}
+img {
+    max-width:100%;
+    height:auto;
+}
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-image: url('../images/bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    height: 100vh; // fallback
+    height: 100dvh; // better on mobile with dynamic bars
+    overflow: hidden;
+}
+
+
+.scene {
+    margin:0 auto;
+    // Make responsive: cap at design size, scale down on small screens
+    width: min(92vw, $width);
+    height: auto;
+    aspect-ratio: $width / $height;
+    perspective: 1000px;
+    .envelop {
+        @include full-width();
+        position: relative;
+        transform-style: preserve-3d;
+        will-change: transform;
+        
+       // transition: transform 1s ease;
+        &__face {
+            @include full-width();
+            position: absolute;
+            backface-visibility: hidden;
+            &--front{
+                background-color: #d6b67d;
+            }
+            &--back{
+                background-color: #d6b67d;
+               // background-image: url('../images/envelope-back-transparent.png');
+               // background-size: 100% auto;
+               // background-repeat: no-repeat;
+                transform: rotateY( 180deg );
+
+                .cover {
+                    width: 100%;
+                    height: 60%;
+                   // background: red;
+                    background-image: url('../images/cover-close.png');
+                    background-size: 100% auto;
+                    background-repeat: no-repeat;
+                    /* transform: rotateX(180deg); */
+                    backface-visibility: hidden;
+                    transform-style: preserve-3d;
+                    z-index: 9;
+                    transform-origin: top;
+                    position:relative;
+                    bottom:-2px;
+                    will-change: transform;
+                   
+                }
+                
+                .cover::after {
+                    content: "";
+                    background-image: url('../images/cover-open.png');
+                    background-size: 100% auto;
+                    background-repeat: no-repeat;
+                    background-position: bottom left;
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    backface-visibility: hidden;
+                    transform: rotateX(180deg);
+                }
+                img#bg {
+                    position: absolute;
+                    bottom: 0;
+                    z-index: 5;
+                }
+                #letter {
+                    position: absolute;
+                    top: -21%;
+                    transform: translateX(-50%) rotate(90deg);
+                    width: 80%;
+                    left: 50%;
+                    z-index: 2;
+                    opacity: 0; // Ẩn trước khi mở phong bì
+                    transform-origin: bottom center;
+                    aspect-ratio: 1 / 1; // Giữ tỉ lệ 1:1 cho bức thư
+                    display: block;
+                    will-change: transform, opacity;
+                    .letter__paper {
+                        background-color: #fff;
+                        background-image: url('../images/black-and-white-handwriting-paper-1-inch-landscape-letter.png');
+                        background-size: cover;
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        border-radius: 8px;
+                        padding: 24px 28px;
+                        border: 1px solid rgba(0,0,0,.05);
+                        box-shadow: 0 8px 24px rgba(0,0,0,.15);
+                        width: 100%;
+                        height: 100%;
+                        box-sizing: border-box;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        font-family: Georgia, 'Times New Roman', serif;
+                        color: #5a4a42;
+                        line-height: 1.5;
+                        h2 {
+                            font-family: Georgia, 'Times New Roman', serif;
+                            color: #e91e63;
+                            font-size: 28px;
+                            margin-bottom: 8px;
+                            text-align: center;
+                        }
+                        p {
+                            margin: 6px 0;
+                            font-size: 18px;
+                        }
+                    }
+                }
+
+
+            }
+        }
+        
+    }
+
+
+}
+
+.actions { margin-top: 12px; }
+
+// Mobile refinements
+@media (max-width: 768px) {
+    .wrapper { background-attachment: scroll; }
+}
+
+@media (max-width: 480px) {
+    .scene { width: min(94vw, $width); }
+    .envelop__face--back #letter .letter__paper {
+        padding: 18px 20px;
+    }
+    .envelop__face--back #letter .letter__paper h2 { font-size: 22px; }
+    .envelop__face--back #letter .letter__paper p { font-size: 16px; }
+    .actions button { font-size: 13px; padding: 9px 14px; }
+}
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    z-index: 998;
+    &.active { opacity: 1; pointer-events: auto; }
+}
+
+.actions {
+    text-align: center;
+    button {
+        background: #e91e63;
+        border: none;
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(233, 30, 99, .3);
+    }
+    button:hover { opacity: .9; }
+}

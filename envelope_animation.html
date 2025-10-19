@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Lời chúc 20/10 - Envelope Animation</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css?family=Sedgwick+Ave" rel="stylesheet">
+    <style>
+        /* Rain effect using images/image-removebg-preview.png */
+        .wrapper {
+            position: relative;
+        }
+
+        .scene {
+            position: relative;
+            z-index: 2;
+        }
+
+        .rain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .raindrop {
+            position: absolute;
+            top: -120px;
+            width: var(--size, 18px);
+            height: auto;
+            opacity: 0.9;
+            will-change: transform;
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .15));
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translate3d(0, 110vh, 0);
+            }
+        }
+
+        /* Gift section with two buttons */
+        .gift-section {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            padding: 24px;
+            position: relative;
+            z-index: 3;
+            /* above scene content */
+        }
+
+        .gift-title {
+            font-family: Georgia, "Times New Roman", serif;
+            color: #5a4a42;
+            font-size: 24px;
+            text-align: center;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, .6);
+        }
+
+        .gift-actions {
+            position: relative;
+            /* bound for the runaway button */
+            width: min(92vw, 560px);
+            height: 220px;
+            /* playground area */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .gift-actions button {
+            background: #e91e63;
+            border: none;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+            transition: transform .08s ease;
+        }
+
+        .gift-actions button:hover {
+            opacity: .92;
+        }
+
+        .gift-actions button:active {
+            transform: scale(.98);
+        }
+
+        /* Start static; will switch to absolute when it runs away */
+        #btn-decline.runaway-active {
+            position: absolute;
+        }
+
+        /* utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.2.min.js"
+        integrity="sha256-2krYZKh//PcchRtd+H+VyyQoZ/e3EcrkxhM8ycwASPA=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js"></script>
+    <script>
+        jQuery(window).on('load', function () {
+            function enterReading() {
+                gsap.set('#letter', {
+                    position: 'fixed', left: '50%', top: '50%', xPercent: -50, yPercent: -50,
+                    rotation: 0, scale: 1, width: 'min(92vmin, 560px)', zIndex: 1000, opacity: 1,
+                    transformOrigin: 'center center'
+                });
+                gsap.fromTo('#letter', { scale: 0.94 }, { scale: 1, duration: 0.45, ease: 'power2.out' });
+            }
+            function exitReading() {
+                $('#overlay').removeClass('active');
+                gsap.set('#letter', {
+                    position: 'absolute', left: '50%', top: '-21%', xPercent: -50, yPercent: 0,
+                    rotation: 90, scale: 1, width: '80%', zIndex: 2, opacity: 0, transformOrigin: 'bottom center'
+                });
+            }
+
+            window.tl = gsap.timeline({
+                paused: true,
+                repeat: 0,
+                repeatDelay: 0.6,
+                defaults: { ease: 'power2.out' }
+            });
+
+            tl.to('.envelop', { rotationY: 180, duration: 0.9, delay: 0.4, ease: 'power1.inOut' })
+                .to('.cover', { rotationX: 180, duration: 0.9, ease: 'power2.inOut' }, '-=0.35')
+                .set($('.cover'), { css: { zIndex: 2 } })
+                .set($('#letter'), { css: { opacity: 1, zIndex: 9 } })
+                // xoay lá thư về đúng hướng, chuẩn bị kéo
+                .to('#letter', { rotation: 0, duration: 0.6, ease: 'power3.out' }, '<0.20')
+                // mô phỏng nắm kéo: hơi nghiêng và nhấc nhẹ
+                .add('grab')
+                .to('#letter', { yPercent: -22, rotationZ: -2, duration: 0.6, ease: 'power2.inOut' }, 'grab')
+                .to('.letter__paper', { boxShadow: '0 12px 28px rgba(0,0,0,0.25)', duration: 0.6, ease: 'power1.out' }, 'grab')
+                // kéo ra dần, hơi lắc trái-phải nhẹ
+                .to('#letter', { yPercent: -44, rotationZ: 1, duration: 0.9, ease: 'power2.out' })
+                .to('#letter', { xPercent: 1.5, duration: 0.28, yoyo: true, repeat: 1, ease: 'sine.inOut' }, '<0.05')
+                // kéo gần hết, trả về thẳng
+                .to('#letter', { yPercent: -66, rotationZ: 0, duration: 0.8, ease: 'power2.out' })
+                .call(enterReading);
+
+            // Slow the whole animation by 30%
+            tl.timeScale(1 / 1.3);
+
+            // Interactions
+            $(document).on('click', '#overlay', function () {
+                exitReading();
+                tl.restart();
+            });
+            $(document).on('click', '#replay', function () {
+                exitReading();
+                tl.restart();
+            });
+
+            // Create falling rain using the provided image
+            (function createRain() {
+                // Fewer drops on small screens for performance
+                var small = window.innerWidth < 1080;
+                var COUNT = small ? 35 : 90; // number of drops
+                var rain = document.createElement('div');
+                rain.className = 'rain';
+                document.body.appendChild(rain);
+
+                for (var i = 0; i < COUNT; i++) {
+                    // var drop = document.createElement('img');
+                    // drop.src = 'images/image-removebg-preview.png';
+                    // drop.alt = '';
+                    // drop.className = 'raindrop';
+
+                    const drop = document.createElement('span');
+                    drop.textContent = '🌷'; // <-- đổi emoji ở đây
+                    drop.className = 'raindrop';
+
+                    var size = 14 + Math.random() * 16; // 14px - 30px
+                    var left = Math.random() * 100;      // vw
+                    var startOffset = -120 - Math.random() * 240; // start above viewport
+                    var duration = 2.6 + Math.random() * 3.2;     // 2.6s - 5.8s
+                    var delay = -Math.random() * 6;               // negative to desync
+
+                    drop.style.setProperty('--size', size + 'px');
+                    drop.style.left = left + 'vw';
+                    drop.style.top = startOffset + 'px';
+                    drop.style.animationDuration = duration + 's';
+                    drop.style.animationDelay = delay + 's';
+                    rain.appendChild(drop);
+                }
+            })();
+
+            // Runaway "chê" button behavior
+            (function runawayButton() {
+                var container = document.querySelector('.gift-actions');
+                var noBtn = document.getElementById('btn-decline');
+                var yesBtn = document.getElementById('btn-accept');
+                if (!container || !noBtn) return;
+
+                function moveNoBtn() {
+                    var cRect = container.getBoundingClientRect();
+                    var bRect = noBtn.getBoundingClientRect();
+                    // ensure absolute positioning within container
+                    noBtn.classList.add('runaway-active');
+                    var maxLeft = Math.max(0, cRect.width - bRect.width);
+                    var maxTop = Math.max(0, cRect.height - bRect.height);
+                    var left = Math.random() * maxLeft;
+                    var top = Math.random() * maxTop;
+                    noBtn.style.left = left + 'px';
+                    noBtn.style.top = top + 'px';
+                }
+
+                // Evade on hover and on press (mouse/touch)
+                ['pointerover', 'mouseenter', 'pointerdown', 'touchstart'].forEach(function (evt) {
+                    noBtn.addEventListener(evt, function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        moveNoBtn();
+                    }, { passive: false });
+                });
+
+                // In case the cursor keeps chasing it, also dodge when pointer moves over the container
+                // (Optional) You can also dodge based on proximity if needed
+
+                // Accept button action
+                if (yesBtn) {
+                    yesBtn.addEventListener('click', function () {
+                        var gift = document.querySelector('.gift-section');
+                        var wrapper = document.querySelector('.wrapper');
+                        if (gift) gift.classList.add('hidden');
+                        if (wrapper) wrapper.classList.remove('hidden');
+
+                        // Play background music
+                        var audio = document.getElementById('bg-music');
+                        if (audio) {
+                            try {
+                                audio.currentTime = 0;
+                                audio.volume = 1;
+                                var p = audio.play();
+                                if (p && typeof p.then === 'function') {
+                                    p.catch(function () { /* ignore autoplay restriction errors */ });
+                                }
+                            } catch (e) { /* no-op */ }
+                        }
+
+                        if (window.tl) { window.tl.restart(); }
+                    });
+                }
+            })();
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Gift section with two buttons: "Nhận quà" and evasive "Chê" placed first -->
+    <section class="gift-section" id="gift">
+        <div class="gift-title">Bạn có muốn nhận quà không?</div>
+        <div class="gift-actions">
+            <button id="btn-accept" type="button">Nhận quà</button>
+            <button id="btn-decline" type="button">Chê</button>
+        </div>
+    </section>
+
+    <!-- Hidden audio, will play on "Nhận quà" click -->
+    <audio id="bg-music" src="images/audio.mp3" preload="auto"></audio>
+
+    <div class="wrapper hidden">
+        <div class="scene">
+            <div class="envelop">
+                <div class="envelop__face envelop__face--back">
+                    <div class="cover">
+
+                    </div>
+                    <img id="bg" src="images/envelope-back-transparent.png" alt="">
+                    <div id="letter" aria-label="Thư chúc 20/10">
+                        <div class="letter__paper">
+                            <h2 style="font-family: 'Sedgwick Ave', cursive;">Chúc mừng 20/10</h2>
+                            <p style="font-family: 'Sedgwick Ave', cursive;">Chúc mừng Ngày Phụ nữ Việt Nam 20/10!</p>
+                            <p style="font-family: 'Sedgwick Ave', cursive;">Gửi ngàn lời chúc tốt đẹp nhất đến một nửa
+                                thế giới.
+                                Chúc các bạn sẽ luôn thành công với mọi quyết định của mình.
+                            </p>
+                            <p style="font-family: 'Sedgwick Ave', cursive;">With best wishes...🌸🌼🌷</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="envelop__face envelop__face--front">
+                    <img src="images/envelop-front.jpg" alt="">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="actions" style="text-align:center; margin-top: 16px;">
+            <button id="replay" type="button">Xem lại</button>
+        </div>
+
+    </div>
+    <div id="overlay" class="overlay" aria-hidden="true"></div>
+
+</body>
+
+</html>
