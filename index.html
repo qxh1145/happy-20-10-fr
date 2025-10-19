@@ -173,22 +173,22 @@
             (function createRain() {
                 // Fewer drops on small screens for performance
                 var small = window.innerWidth < 1080;
-                var COUNT = small ? 35 : 90; // number of drops
+                var COUNT = small ? 35 : 60; // number of drops
                 var rain = document.createElement('div');
                 rain.className = 'rain';
                 document.body.appendChild(rain);
 
                 for (var i = 0; i < COUNT; i++) {
-                    // var drop = document.createElement('img');
-                    // drop.src = 'images/image-removebg-preview.png';
-                    // drop.alt = '';
-                    // drop.className = 'raindrop';
-
-                    const drop = document.createElement('span');
-                    drop.textContent = '🌷'; // <-- đổi emoji ở đây
+                    var drop = document.createElement('img');
+                    drop.src = 'images/image-removebg-preview (2).png';
+                    drop.alt = '';
                     drop.className = 'raindrop';
 
-                    var size = 14 + Math.random() * 16; // 14px - 30px
+                    // const drop = document.createElement('span');
+                    // drop.textContent = '🌷'; // <-- đổi emoji ở đây
+                    // drop.className = 'raindrop';
+
+                    var size = 100 + Math.random() * 16; // 14px - 30px
                     var left = Math.random() * 100;      // vw
                     var startOffset = -120 - Math.random() * 240; // start above viewport
                     var duration = 2.6 + Math.random() * 3.2;     // 2.6s - 5.8s
